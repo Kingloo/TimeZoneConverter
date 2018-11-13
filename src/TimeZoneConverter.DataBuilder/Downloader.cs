@@ -10,26 +10,29 @@ namespace TimeZoneConverter.DataBuilder
     {
         private static readonly HttpClient HttpClientInstance = new HttpClient();
 
-        public static async Task DownloadCldrAsync(string dir)
+        public static Task DownloadCldrAsync(string dir)
         {
-            const string url1 = "http://unicode.org/repos/cldr/trunk/common/supplemental/windowsZones.xml";
-            const string url2 = "http://unicode.org/repos/cldr/trunk/common/bcp47/timezone.xml";
+            const string url1 = "https://unicode.org/repos/cldr/trunk/common/supplemental/windowsZones.xml";
+            const string url2 = "https://unicode.org/repos/cldr/trunk/common/bcp47/timezone.xml";
 
             var t1 = DownloadAsync(url1, dir);
             var t2 = DownloadAsync(url2, dir);
-            await Task.WhenAll(t1, t2);
+
+            return Task.WhenAll(t1, t2);
         }
         
-        public static async Task DownloadTzdbAsync(string dir)
+        public static Task DownloadTzdbAsync(string dir)
         {
-            const string url = "http://www.iana.org/time-zones/repository/tzdata-latest.tar.gz";
-            await DownloadAndExtractAsync(url, dir);
+            const string url = "https://www.iana.org/time-zones/repository/tzdata-latest.tar.gz";
+
+            return DownloadAndExtractAsync(url, dir);
         }
 
-        public static async Task DownloadRailsTzMappingAsync(string dir)
+        public static Task DownloadRailsTzMappingAsync(string dir)
         {
             const string url = "https://raw.githubusercontent.com/rails/rails/master/activesupport/lib/active_support/values/time_zone.rb";
-            await DownloadAsync(url, dir);
+
+            return DownloadAsync(url, dir);
         }
 
         public static string GetTempDir()
@@ -43,16 +46,17 @@ namespace TimeZoneConverter.DataBuilder
                 Directory.CreateDirectory(dir);
 
             var filename = url.Substring(url.LastIndexOf('/') + 1);
-            using (var result = await HttpClientInstance.GetAsync(url))
+
+            using (var result = await HttpClientInstance.GetAsync(url).ConfigureAwait(false))
             using (var fs = File.Create(Path.Combine(dir, filename)))
             {
-                await result.Content.CopyToAsync(fs);
+                await result.Content.CopyToAsync(fs).ConfigureAwait(false);
             }
         }
 
         private static async Task DownloadAndExtractAsync(string url, string dir)
         {
-            using (var httpStream = await HttpClientInstance.GetStreamAsync(url))
+            using (var httpStream = await HttpClientInstance.GetStreamAsync(url).ConfigureAwait(false))
             using (var reader = ReaderFactory.Open(httpStream))
             {
                 if (!Directory.Exists(dir))
@@ -75,7 +79,7 @@ namespace TimeZoneConverter.DataBuilder
                     using (var stream = reader.OpenEntryStream())
                     using (var fs = File.Create(targetPath))
                     {
-                        await stream.CopyToAsync(fs);
+                        await stream.CopyToAsync(fs).ConfigureAwait(false);
                     }
                 }
             }

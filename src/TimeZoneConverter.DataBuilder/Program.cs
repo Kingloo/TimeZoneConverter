@@ -9,7 +9,7 @@ namespace TimeZoneConverter.DataBuilder
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var tempDir = Downloader.GetTempDir();
 
@@ -25,7 +25,8 @@ namespace TimeZoneConverter.DataBuilder
                     var t1 = Downloader.DownloadCldrAsync(cldrPath);
                     var t2 = Downloader.DownloadTzdbAsync(tzdbPath);
                     var t3 = Downloader.DownloadRailsTzMappingAsync(railsPath);
-                    Task.WaitAll(t1, t2, t3);
+
+                    await Task.WhenAll(t1, t2, t3);
                 }
 
                 // Extract links from TZDB
