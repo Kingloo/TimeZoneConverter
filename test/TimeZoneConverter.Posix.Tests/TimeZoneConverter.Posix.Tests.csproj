@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TimeZoneConverter\TimeZoneConverter.csproj" />
+    <ProjectReference Include="..\..\src\TimeZoneConverter.Posix\TimeZoneConverter.Posix.csproj" />
   </ItemGroup>
 
   <ItemGroup>

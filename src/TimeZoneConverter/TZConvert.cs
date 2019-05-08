@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-#if !NETSTANDARD1_1
+#if NETSTANDARD2_0 || NETSTANDARD1_3
 using System.Runtime.InteropServices;
 #endif
 
@@ -18,10 +18,10 @@ namespace TimeZoneConverter
         private static readonly IDictionary<string, string> RailsMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private static readonly IDictionary<string, IList<string>> InverseRailsMap = new Dictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);
 
-#if NET35 || NET40 || NETSTANDARD1_1
-        private const bool IsWindows = true;
-#else
+#if NETSTANDARD2_0 || NETSTANDARD1_3
         private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+#else
+        private const bool IsWindows = true;
 #endif
 
 #if !NETSTANDARD1_1
@@ -318,13 +318,11 @@ namespace TimeZoneConverter
 #if !NETSTANDARD1_1
         private static Dictionary<string, TimeZoneInfo> GetSystemTimeZones()
         {
-#if NET35 || NET40
-            return TimeZoneInfo.GetSystemTimeZones().ToDictionary(x => x.Id, x => x);
-#else
+#if NETSTANDARD2_0 || NETSTANDARD1_3
             if (IsWindows)
-                return TimeZoneInfo.GetSystemTimeZones().ToDictionary(x => x.Id, x => x);
+                return TimeZoneInfo.GetSystemTimeZones().ToDictionary(x => x.Id, x => x, StringComparer.OrdinalIgnoreCase);
 
-            var zones = GetSystemTimeZonesLinux().ToDictionary(x => x.Id, x => x);
+            var zones = GetSystemTimeZonesLinux().ToDictionary(x => x.Id, x => x, StringComparer.OrdinalIgnoreCase);
 
             // Include special case to resolve deleted link
             if (!zones.ContainsKey("Canada/East-Saskatchewan"))
@@ -340,9 +338,12 @@ namespace TimeZoneConverter
             }
 
             return zones;
+#else
+            return TimeZoneInfo.GetSystemTimeZones().ToDictionary(x => x.Id, x => x, StringComparer.OrdinalIgnoreCase);
 #endif
         }
 
+#if NETSTANDARD2_0 || NETSTANDARD1_3
         private static IEnumerable<TimeZoneInfo> GetSystemTimeZonesLinux()
         {
             // Don't trust TimeZoneInfo.GetSystemTimeZones on Non-Windows
@@ -364,6 +365,7 @@ namespace TimeZoneConverter
                     yield return tzi;
             }
         }
+#endif
 #endif
     }
 }

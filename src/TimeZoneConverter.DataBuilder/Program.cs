@@ -36,7 +36,7 @@ namespace TimeZoneConverter.DataBuilder
                 links.Add("Etc/GMT", "Etc/UTC");
                 foreach (var tzdbLink in links.ToList())
                 {
-                    if (tzdbLink.Value == "Etc/GMT" || tzdbLink.Value == "Etc/UCT")
+                    if (tzdbLink.Value == "Etc/GMT")
                         links[tzdbLink.Key] = "Etc/UTC";
                 }
 
@@ -48,13 +48,20 @@ namespace TimeZoneConverter.DataBuilder
                 var railsMapping = DataExtractor.LoadRailsMapping(railsPath);
 
                 // Apply overrides
-                mapping.Remove("W. Central Africa Standard Time,ST,Africa/Sao_Tome");
-                mapping.Add("Sao Tome Standard Time,001,Africa/Sao_Tome");
-                mapping.Add("Sao Tome Standard Time,ST,Africa/Sao_Tome");
+                mapping.Remove("West Asia Standard Time,KZ,Asia/Oral Asia/Aqtau Asia/Aqtobe Asia/Atyrau Asia/Qyzylorda");
+                mapping.Add("West Asia Standard Time,KZ,Asia/Oral Asia/Aqtau Asia/Aqtobe Asia/Atyrau");
+                mapping.Add("Qyzylorda Standard Time,001,Asia/Qyzylorda");
+                mapping.Add("Qyzylorda Standard Time,KZ,Asia/Qyzylorda");
 
-                mapping.Remove("GTB Standard Time,CY,Asia/Nicosia");
-                mapping.Remove("Turkey Standard Time,CY,Asia/Famagusta");
-                mapping.Add("GTB Standard Time,CY,Asia/Nicosia Asia/Famagusta");
+                mapping.Remove("Russian Standard Time,RU,Europe/Moscow Europe/Kirov Europe/Volgograd");
+                mapping.Add("Russian Standard Time,RU,Europe/Moscow Europe/Kirov");
+                mapping.Add("Volgograd Standard Time,001,Europe/Volgograd");
+                mapping.Add("Volgograd Standard Time,RU,Europe/Volgograd");
+
+                mapping.Remove("Alaskan Standard Time,US,America/Anchorage America/Juneau America/Nome America/Sitka America/Yakutat");
+                mapping.Add("Alaskan Standard Time,US,America/Anchorage America/Juneau America/Metlakatla America/Nome America/Sitka America/Yakutat");
+                mapping.Remove("Pacific Standard Time,US,America/Los_Angeles America/Metlakatla");
+                mapping.Add("Pacific Standard Time,US,America/Los_Angeles");
 
                 mapping.Add("Romance Standard Time,EA,Africa/Ceuta");
                 mapping.Add("GMT Standard Time,IC,Atlantic/Canary");
