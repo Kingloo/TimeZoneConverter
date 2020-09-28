@@ -17,24 +17,30 @@ namespace TimeZoneConverter.Tests
         [Fact]
         public void Can_Convert_Iana_Zones_To_Rails_Zones()
         {
-            var errors = 0;
-            var ianaZones = TZConvert.KnownIanaTimeZoneNames;
+            var errors = new List<string>();
+            IOrderedEnumerable<string> ianaZones = TZConvert.KnownIanaTimeZoneNames.OrderBy(x => x);
 
-            foreach (var ianaZone in ianaZones.Except(UnmappableZones))
+            foreach (string ianaZone in ianaZones.Except(UnmappableZones))
             {
-                if (TZConvert.TryIanaToRails(ianaZone, out var railsZones))
+                if (TZConvert.TryIanaToRails(ianaZone, out IList<string> railsZones))
                 {
                     Assert.NotNull(railsZones);
                     Assert.NotEmpty(railsZones);
                 }
                 else
                 {
-                    errors++;
-                    _output.WriteLine($"Failed to convert \"{ianaZone}\"");
+                    errors.Add(ianaZone);
                 }
             }
 
-            Assert.Equal(0, errors);
+            int errorsCount = errors.Count;
+            if (errorsCount > 0)
+            {
+                _output.WriteLine("Failed to convert:\n");
+                _output.WriteLine(string.Join(",\n", errors.Select(x => $"\"{x}\"")));
+            }
+
+            Assert.Equal(0, errorsCount);
         }
 
         private static IEnumerable<string> UnmappableZones => new[]
@@ -81,7 +87,6 @@ namespace TimeZoneConverter.Tests
             "America/Grand_Turk",
             "America/Havana",
             "America/Maceio",
-            "America/Metlakatla",
             "America/Miquelon",
             "America/Noronha",
             "America/Paramaribo",
@@ -91,12 +96,12 @@ namespace TimeZoneConverter.Tests
             "America/Santarem",
             "Antarctica/Palmer",
             "Antarctica/Rothera",
+            "Antarctica/Troll",
             "Asia/Amman",
             "Asia/Barnaul",
             "Asia/Beirut",
             "Asia/Chita",
             "Asia/Damascus",
-            "Asia/Dubai",
             "Asia/Gaza",
             "Asia/Hebron",
             "Asia/Hovd",
@@ -105,7 +110,6 @@ namespace TimeZoneConverter.Tests
             "Asia/Qyzylorda",
             "Asia/Sakhalin",
             "Asia/Tomsk",
-            "Asia/Yangon",
             "Atlantic/Reykjavik",
             "Atlantic/St_Helena",
             "Atlantic/Stanley",
@@ -116,7 +120,6 @@ namespace TimeZoneConverter.Tests
             "Chile/EasterIsland",
             "Cuba",
             "Etc/GMT+11",
-            "Etc/GMT+12",
             "Etc/GMT+2",
             "Etc/GMT+3",
             "Etc/GMT+8",
@@ -125,14 +128,12 @@ namespace TimeZoneConverter.Tests
             "Etc/GMT-12",
             "Etc/GMT-13",
             "Etc/GMT-14",
-            "Etc/GMT-4",
             "Europe/Astrakhan",
             "Europe/Chisinau",
             "Europe/Saratov",
             "Europe/Tiraspol",
             "Europe/Ulyanovsk",
             "Iceland",
-            "Indian/Cocos",
             "Indian/Mahe",
             "Indian/Mauritius",
             "Indian/Reunion",

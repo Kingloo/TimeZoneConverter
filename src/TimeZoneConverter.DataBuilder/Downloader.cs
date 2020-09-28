@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SharpCompress.Common;
 using SharpCompress.Readers;
 
 namespace TimeZoneConverter.DataBuilder
@@ -45,6 +46,7 @@ namespace TimeZoneConverter.DataBuilder
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
+<<<<<<< HEAD
             var filename = url.Substring(url.LastIndexOf('/') + 1);
 
             using (var result = await HttpClientInstance.GetAsync(url).ConfigureAwait(false))
@@ -52,36 +54,55 @@ namespace TimeZoneConverter.DataBuilder
             {
                 await result.Content.CopyToAsync(fs).ConfigureAwait(false);
             }
+=======
+            string filename = url.Substring(url.LastIndexOf('/') + 1);
+            using HttpResponseMessage result = await HttpClientInstance.GetAsync(url);
+            await using FileStream fs = File.Create(Path.Combine(dir, filename));
+            await result.Content.CopyToAsync(fs);
+>>>>>>> sourceMaster
         }
 
         private static async Task DownloadAndExtractAsync(string url, string dir)
         {
+<<<<<<< HEAD
             using (var httpStream = await HttpClientInstance.GetStreamAsync(url).ConfigureAwait(false))
             using (var reader = ReaderFactory.Open(httpStream))
             {
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
+=======
+            await using Stream httpStream = await HttpClientInstance.GetStreamAsync(url);
+            using IReader reader = ReaderFactory.Open(httpStream);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+>>>>>>> sourceMaster
 
-                while (reader.MoveToNextEntry())
-                {
-                    var entry = reader.Entry;
-                    if (entry.IsDirectory)
-                        continue;
+            while (reader.MoveToNextEntry())
+            {
+                IEntry entry = reader.Entry;
+                if (entry.IsDirectory)
+                    continue;
 
-                    var targetPath = Path.Combine(dir, entry.Key.Replace('/', '\\'));
-                    var targetDir = Path.GetDirectoryName(targetPath);
-                    if (targetDir == null)
-                        throw new InvalidOperationException();
+                string targetPath = Path.Combine(dir, entry.Key.Replace('/', '\\'));
+                string targetDir = Path.GetDirectoryName(targetPath);
+                if (targetDir == null)
+                    throw new InvalidOperationException();
 
-                    if (!Directory.Exists(targetDir))
-                        Directory.CreateDirectory(targetDir);
+                if (!Directory.Exists(targetDir))
+                    Directory.CreateDirectory(targetDir);
 
+<<<<<<< HEAD
                     using (var stream = reader.OpenEntryStream())
                     using (var fs = File.Create(targetPath))
                     {
                         await stream.CopyToAsync(fs).ConfigureAwait(false);
                     }
                 }
+=======
+                await using EntryStream stream = reader.OpenEntryStream();
+                await using FileStream fs = File.Create(targetPath);
+                await stream.CopyToAsync(fs);
+>>>>>>> sourceMaster
             }
         }
     }
